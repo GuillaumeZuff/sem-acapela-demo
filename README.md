@@ -10,6 +10,7 @@ Scripts et démo minimale pour l'utilisation d'Acapela.
 * secrets-example.php - les données d'accès à Acapela, à renommer (secrets.php)
 * main.js - le script de la démonstration
 * index.html - la page de démonstration, un simple text input et un bouton pour lire le texte
+* lib/jquery-2.0.3.min.js - la librairie jquery
 
 ## Setup
 
