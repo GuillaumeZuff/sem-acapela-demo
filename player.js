@@ -1,31 +1,10 @@
-// Script exécuté lorsque la page est chargée.
-// Dans cet exemple:
-// - crée un WordPlayer (voir ci-dessous)
-// - à chaque clic sur le bouton:
-//      - lit le mot dans le champ input
-//      - passe le mot au WordPlayer
-$(document).ready(function() {
-    var config = {
-        mp3SourceId: 'mp3Source',
-        audioPlayerId: 'audioPlayer',
-        acapelaUrl: 'acapela.php'
-    };
-    var wordPlayer = WordPlayer(config);
-    wordPlayer.onStatusChange(function(data) {
-        $('.status').text(data.status);
-    });
-    $('#play').click(function(e) {
-        word = $('#textInput').val();
-        console.log("Playing", word);
-        if (word && word!=='') {
-            wordPlayer.play(word);
-        }
-    });
-});
-
 // lecteur de voix synthétique
 // appelle un script php sur le serveur pour générer un fichier mp3
-var WordPlayer = function(config) {
+// Paramètre config:
+// - audioId: id de l'élément audio
+// - sourceId: id de la source (dans l'élément audio)
+// - acapelaUrl: url du script php acapela
+var AcapelaPlayer = function(config) {
     // cache pour éviter de générer plusieurs fois les mêmes requêtes
     var cache = {};
     // génèrent des événements - utile pour informer les utilisateurs
@@ -35,12 +14,13 @@ var WordPlayer = function(config) {
     // place l'url reçue d'accapela dans le player audio html
     var playSound = function(url) {
         // lecteur audio sur la page html
-        var player = $('#'+config.audioPlayerId).get(0)
+        var player = $('#'+config.audioId).get(0)
         // la source mp3 du player
-        var source = $('#'+config.mp3SourceId);
+        var source = $('#'+config.sourceId);
         source.attr('src',url).detach().appendTo(player);
-        // important de charger la nouvelle url (refresh)
+        // on charge la nouvelle url (nécessaire pour rafraîchir)
         player.load()
+        // on lit le mp3 qui vient d'être chargé
         player.play()
     };
 
@@ -60,18 +40,16 @@ var WordPlayer = function(config) {
             };
             // appelle le script php pour générer un ficher mp3
             var url = config.acapelaUrl;
-            $.post(url,data,function(data,textStatus,jqXHR) {
+            $.post(url, data, function(data,textStatus,jqXHR) {
                 try {
                     // la réponse est donnée en JSON
                     var answer = JSON.parse(data);
                     if (answer.status === 'OK') {
                         // ok, le mot a pu être généré
-                        var url = answer.snd_url;
                         // on l'ajoute au cache
-                        cache[word] = url;
+                        cache[word] = answer.snd_url;
                         // et on le lit
-                        playSound(url);
-                        // changement de status
+                        playSound(answer.snd_url);
                         listeners.fire({status:'ready'});
                         return;
                     } else {
@@ -81,7 +59,6 @@ var WordPlayer = function(config) {
                     console.log("Erreur lors de la génération de la voix synthétisée: ",e);
                     console.log("Réponse: ",data);
                 }
-                // changement de status: échec
                 listeners.fire({status:'failed'});
             });
         }
