@@ -1,7 +1,12 @@
 sem-acapela-demo
 ================
 
-Démo minimale pour l'utilisation d'Acapela
+Scripts et démo minimale pour l'utilisation d'Acapela.
 
-Editez le fichier secrets-example.php et ajoutez vos données d'accès à Acapela.
-Renommez le fichier comme secrets.php.
+## Fichiers
+
+* player.js - le script permettant de générer et lire des mp3 avec Acapela
+* acapela.php - le script php qui communique avec l'API d'Acapela
+* secrets-example.php - les données d'accès à Acapela, à renommer (secrets.php)
+* main.js - le script de la démonstration
+* index.html - la page de démonstration, un simple text input et un bouton pour lire le texte
